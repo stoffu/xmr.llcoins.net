@@ -238,6 +238,23 @@ var cnUtil = (function(initConfig) {
         return out;
     };
 
+    this.decode_varint = function(hex) {
+        var input = hextobin(hex);
+        for (var i = 0; i < input.length - 1; ++i) {
+            if ((input[i] & 0x80) === 0)
+                throw "Invalid input: MSB mustn't be zero for all but the last byte";
+        }
+        if ((input[input.length] & 0x80) !== 0)
+            throw "Invalid input: MSB must be zero for the last byte";
+        var out = 0;
+        var base = 1;
+        for (var i = 0; i < input.length; ++i) {
+            out += (input[i] & 0x7f) * base;
+            base *= 128;
+        }
+        return out;
+    };
+
     this.sc_reduce = function(hex) {
         var input = hextobin(hex);
         if (input.length !== 64) {
